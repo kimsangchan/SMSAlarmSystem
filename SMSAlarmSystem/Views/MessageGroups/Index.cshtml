@@ -1,0 +1,118 @@
+﻿@model IEnumerable<SMSAlarmSystem.Core.Models.MessageGroup>
+
+@{
+    ViewData["Title"] = "메시지 그룹 목록";
+}
+
+<!-- 작성자: Sangchan, Kim -->
+<!-- 작성일: 2025-03-27 -->
+<!-- 기능: 메시지 그룹 목록 표시 -->
+<!-- 설명: 모든 메시지 그룹을 표시하고 관리할 수 있는 페이지입니다. -->
+<div class="container mx-auto px-4 py-8">
+    <!-- 페이지 헤더 영역 - 제목과 생성 버튼 -->
+    <div class="flex justify-between items-center mb-6">
+        <!-- 페이지 제목 -->
+        <h1 class="text-2xl font-bold text-gray-800">메시지 그룹 목록</h1>
+        <!-- 새 메시지 그룹 등록 버튼 -->
+        <a asp-action="Create" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
+            새 메시지 그룹 등록
+        </a>
+    </div>
+
+    <!-- 메시지 그룹 목록 테이블 -->
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+            <!-- 테이블 헤더 -->
+            <thead class="bg-gray-50">
+                <tr>
+                    <!-- 이름 열 헤더 -->
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        이름
+                    </th>
+                    <!-- 설명 열 헤더 -->
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        설명
+                    </th>
+                    <!-- 회원 수 열 헤더 -->
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        회원 수
+                    </th>
+                    <!-- 알람 포인트 수 열 헤더 -->
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        알람 포인트 수
+                    </th>
+                    <!-- 활성 상태 열 헤더 -->
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        상태
+                    </th>
+                    <!-- 작업 열 헤더 -->
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        작업
+                    </th>
+                </tr>
+            </thead>
+            <!-- 테이블 본문 -->
+            <tbody class="bg-white divide-y divide-gray-200">
+                @if (Model != null && Model.Any())
+                {
+                    <!-- 메시지 그룹 항목 반복 -->
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <!-- 이름 열 - null 체크 -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @(item?.Name ?? "이름 없음")
+                            </td>
+                            <!-- 설명 열 - null 체크 -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @(item?.Description ?? "설명 없음")
+                            </td>
+                            <!-- 회원 수 열 - null 체크 -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @(item?.GroupMembers?.Count ?? 0) 명
+                            </td>
+                            <!-- 알람 포인트 수 열 - null 체크 -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @(item?.AlarmPoints?.Count ?? 0) 개
+                            </td>
+                            <!-- 활성 상태 열 - null 체크 -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if (item?.IsActive == true)
+                                {
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        활성
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                        비활성
+                                    </span>
+                                }
+                            </td>
+                            <!-- 작업 열 - 항목이 null이 아닌 경우에만 링크 표시 -->
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                @if (item != null)
+                                {
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="text-indigo-600 hover:text-indigo-900 mr-3">수정</a>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="text-blue-600 hover:text-blue-900 mr-3">상세</a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="text-red-600 hover:text-red-900 mr-3">삭제</a>
+                                    <a asp-action="Members" asp-route-id="@item.Id" class="text-green-600 hover:text-green-900">회원 관리</a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <!-- 데이터가 없는 경우 표시할 메시지 -->
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                            표시할 메시지 그룹이 없습니다.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

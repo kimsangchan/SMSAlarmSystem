@@ -1,0 +1,155 @@
+﻿@model IEnumerable<SMSAlarmSystem.Core.Models.Message>
+
+@{
+    ViewData["Title"] = "메시지 내역";
+}
+
+<!-- 작성자: Sangchan, Kim -->
+<!-- 작성일: 2025-03-27 -->
+<!-- 기능: 메시지 내역 목록 표시 -->
+<!-- 설명: 날짜 범위로 메시지를 필터링하고 목록을 표시합니다. -->
+<div class="container mx-auto px-4 py-8">
+    <!-- 페이지 헤더 영역 -->
+    <div class="mb-6">
+        <!-- 페이지 제목 -->
+        <h1 class="text-2xl font-bold text-gray-800 mb-4">메시지 내역</h1>
+
+        <!-- 날짜 범위 필터 폼 -->
+        <form method="get" class="bg-white p-4 rounded-lg shadow-md mb-6">
+            <div class="flex flex-wrap -mx-2">
+                <!-- 시작일 선택 -->
+                <div class="px-2 w-full md:w-1/3 mb-4 md:mb-0">
+                    <label for="startDate" class="block text-sm font-medium text-gray-700 mb-1">시작일</label>
+                    <input type="date" id="startDate" name="startDate" value="@ViewBag.StartDate"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                </div>
+                <!-- 종료일 선택 -->
+                <div class="px-2 w-full md:w-1/3 mb-4 md:mb-0">
+                    <label for="endDate" class="block text-sm font-medium text-gray-700 mb-1">종료일</label>
+                    <input type="date" id="endDate" name="endDate" value="@ViewBag.EndDate"
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                </div>
+                <!-- 조회 버튼 -->
+                <div class="px-2 w-full md:w-1/3 flex items-end">
+                    <button type="submit" class="w-full bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-md">
+                        조회
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- 메시지 목록 테이블 -->
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+            <!-- 테이블 헤더 -->
+            <thead class="bg-gray-50">
+                <tr>
+                    <!-- 발송 시간 열 헤더 -->
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        발송 시간
+                    </th>
+                    <!-- 알람 포인트 열 헤더 -->
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        알람 포인트
+                    </th>
+                    <!-- 메시지 그룹 열 헤더 -->
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        메시지 그룹
+                    </th>
+                    <!-- 메시지 내용 열 헤더 -->
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        내용
+                    </th>
+                    <!-- 상태 열 헤더 -->
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        상태
+                    </th>
+                    <!-- 작업 열 헤더 -->
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        작업
+                    </th>
+                </tr>
+            </thead>
+            <!-- 테이블 본문 -->
+            <tbody class="bg-white divide-y divide-gray-200">
+                @if (Model != null && Model.Any())
+                {
+                    <!-- 메시지 항목 반복 -->
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <!-- 발송 시간 열 - null 체크 -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @(item?.SendTime.ToString("yyyy-MM-dd HH:mm:ss") ?? "시간 정보 없음")
+                            </td>
+                            <!-- 알람 포인트 열 - null 체크 -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @(item?.AlarmPoint?.Name ?? "알람 포인트 정보 없음")
+                            </td>
+                            <!-- 메시지 그룹 열 - null 체크 -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @(item?.MessageGroup?.Name ?? "그룹 정보 없음")
+                            </td>
+                            <!-- 메시지 내용 열 - 길이가 길 경우 잘라서 표시, null 체크 -->
+                            <td class="px-6 py-4">
+                                <div class="truncate max-w-xs">
+                                    @(item?.Content ?? "내용 없음")
+                                </div>
+                            </td>
+                            <!-- 상태 열 - 상태에 따라 다른 스타일 적용, null 체크 -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if (item?.Status == "발송 완료")
+                                {
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        @item.Status
+                                    </span>
+                                }
+                                else if (item?.Status == "발송 중")
+                                {
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                                        @item.Status
+                                    </span>
+                                }
+                                else if (item?.Status == "일부 발송 실패")
+                                {
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-orange-100 text-orange-800">
+                                        @item.Status
+                                    </span>
+                                }
+                                else if (item?.Status == "발송 실패")
+                                {
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                        @item.Status
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                                        @(item?.Status ?? "상태 정보 없음")
+                                    </span>
+                                }
+                            </td>
+                            <!-- 작업 열 - 상세 보기 링크, null 체크 -->
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                @if (item != null)
+                                {
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="text-blue-600 hover:text-blue-900">상세</a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <!-- 데이터가 없는 경우 표시할 메시지 -->
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                            표시할 메시지 내역이 없습니다.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

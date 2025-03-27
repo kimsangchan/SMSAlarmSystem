@@ -1,0 +1,92 @@
+﻿@model SMSAlarmSystem.Core.Models.AlarmPoint
+
+@{
+    ViewData["Title"] = "알람 트리거";
+}
+
+<!-- 작성자: Sangchan, Kim -->
+<!-- 작성일: 2025-03-27 -->
+<!-- 기능: 알람 트리거 페이지 -->
+<!-- 설명: 알람 포인트 정보를 표시하고 메시지 내용을 입력받아 알람을 트리거합니다. -->
+<div class="container mx-auto px-4 py-8">
+    <!-- 알람 트리거 카드 컨테이너 -->
+    <div class="bg-white shadow-md rounded-lg p-6">
+        <!-- 페이지 제목 -->
+        <h1 class="text-2xl font-bold text-gray-800 mb-6">알람 트리거</h1>
+
+        @if (Model != null)
+        {
+            <!-- 알람 포인트 정보 섹션 -->
+            <div class="mb-6">
+                <h2 class="text-lg font-semibold mb-2">알람 포인트 정보</h2>
+                <!-- 알람 포인트 상세 정보 표시 영역 -->
+                <div class="bg-gray-50 p-4 rounded-md">
+                    <!-- 알람 포인트 이름 -->
+                    <p><span class="font-medium">이름:</span> @Model.Name</p>
+                    <!-- 알람 포인트 설명 (null일 경우 대체 텍스트 표시) -->
+                    <p><span class="font-medium">설명:</span> @(Model.Description ?? "설명 없음")</p>
+                    <!-- 알람 조건 (null일 경우 대체 텍스트 표시) -->
+                    <p><span class="font-medium">조건:</span> @(Model.Condition ?? "조건 없음")</p>
+                    <!-- 알람 포인트 활성화 상태 -->
+                    <p>
+                        <span class="font-medium">상태:</span>
+                        @if (Model.IsActive)
+                        {
+                            <span class="text-green-600">활성</span>
+                        }
+                        else
+                        {
+                            <span class="text-red-600">비활성</span>
+                        }
+                    </p>
+                </div>
+            </div>
+
+            <!-- 알람 트리거 폼 - 메시지 내용 입력 및 발송 -->
+            <form asp-action="Trigger" method="post">
+                <!-- 알람 포인트 ID (숨김 필드) -->
+                <input type="hidden" asp-for="Id" />
+
+                <!-- 메시지 내용 입력 영역 -->
+                <div class="mb-4">
+                    <label for="messageContent" class="block text-sm font-medium text-gray-700 mb-2">메시지 내용</label>
+                    <textarea id="messageContent" name="messageContent" rows="4"
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                              placeholder="발송할 메시지 내용을 입력하세요" required></textarea>
+                </div>
+
+                <!-- 버튼 영역 -->
+                <div class="flex items-center justify-between mt-6">
+                    <!-- 목록으로 돌아가기 링크 -->
+                    <a asp-action="Index" class="text-gray-600 hover:text-gray-800">목록으로 돌아가기</a>
+                    <!-- 알람 트리거 버튼 -->
+                    <button type="submit" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg">
+                        알람 트리거 (메시지 발송)
+                    </button>
+                </div>
+            </form>
+        }
+        else
+        {
+            <!-- 알람 포인트가 null인 경우 표시할 메시지 -->
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-yellow-700">
+                            알람 포인트 정보를 찾을 수 없습니다.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            <!-- 목록으로 돌아가기 링크 -->
+            <div class="mt-4">
+                <a asp-action="Index" class="text-blue-600 hover:text-blue-900">알람 포인트 목록으로 돌아가기</a>
+            </div>
+        }
+    </div>
+</div>

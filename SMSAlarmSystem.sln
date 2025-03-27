@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMSAlarmSystem", "SMSAlarmSystem\SMSAlarmSystem.csproj", "{13455067-79AE-4C4B-876A-137F32C879CD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMSAlarmSystem.Core", "SMSAlarmSystem.Core\SMSAlarmSystem.Core.csproj", "{E436B87E-D8D7-45F6-9FE7-5EB6F5DE4E5C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMSAlarmSystem.Infrastructure", "SMSAlarmSystem.Infrastructure\SMSAlarmSystem.Infrastructure.csproj", "{3715EA9C-3B25-4FAE-BDF2-7AA889CC161A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMSAlarmSystem.Services", "SMSAlarmSystem.Services\SMSAlarmSystem.Services.csproj", "{6F2913C5-6FCA-40A2-9BA2-7DB0131E35B5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SMSAlarmSystem.Tests", "SMSAlarmSystem.Tests\SMSAlarmSystem.Tests.csproj", "{CF41372D-FC17-4B24-A1A8-D3D5180236FF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{13455067-79AE-4C4B-876A-137F32C879CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13455067-79AE-4C4B-876A-137F32C879CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13455067-79AE-4C4B-876A-137F32C879CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13455067-79AE-4C4B-876A-137F32C879CD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E436B87E-D8D7-45F6-9FE7-5EB6F5DE4E5C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E436B87E-D8D7-45F6-9FE7-5EB6F5DE4E5C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E436B87E-D8D7-45F6-9FE7-5EB6F5DE4E5C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E436B87E-D8D7-45F6-9FE7-5EB6F5DE4E5C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3715EA9C-3B25-4FAE-BDF2-7AA889CC161A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3715EA9C-3B25-4FAE-BDF2-7AA889CC161A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3715EA9C-3B25-4FAE-BDF2-7AA889CC161A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3715EA9C-3B25-4FAE-BDF2-7AA889CC161A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F2913C5-6FCA-40A2-9BA2-7DB0131E35B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F2913C5-6FCA-40A2-9BA2-7DB0131E35B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F2913C5-6FCA-40A2-9BA2-7DB0131E35B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F2913C5-6FCA-40A2-9BA2-7DB0131E35B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF41372D-FC17-4B24-A1A8-D3D5180236FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF41372D-FC17-4B24-A1A8-D3D5180236FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF41372D-FC17-4B24-A1A8-D3D5180236FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF41372D-FC17-4B24-A1A8-D3D5180236FF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {98A34F5F-2A2B-40D0-B83B-2057AB6D87A9}
+	EndGlobalSection
+EndGlobal

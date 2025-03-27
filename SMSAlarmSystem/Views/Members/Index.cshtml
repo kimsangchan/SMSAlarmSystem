@@ -1,0 +1,110 @@
+﻿@model IEnumerable<SMSAlarmSystem.Core.Models.Member>
+
+@{
+    ViewData["Title"] = "회원 목록";
+}
+
+<div class="container mx-auto px-4 py-8">
+    <!-- 2025-03-27: 페이지 헤더 영역 - 제목과 생성 버튼 -->
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">회원 목록</h1>
+        <a asp-action="Create" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
+            새 회원 등록
+        </a>
+    </div>
+
+    <!-- 2025-03-27: 회원 목록 테이블 -->
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200">
+            <!-- 테이블 헤더 -->
+            <thead class="bg-gray-50">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        이름
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        전화번호
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        이메일
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        등록일
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        상태
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        작업
+                    </th>
+                </tr>
+            </thead>
+            <!-- 테이블 본문 -->
+            <tbody class="bg-white divide-y divide-gray-200">
+                @if (Model != null)
+                {
+                    <!-- 2025-03-27: 모델이 존재할 경우 항목 반복 -->
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <!-- 2025-03-27: 이름 열 - null 체크 추가 -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @(item?.Name ?? "이름 없음")
+                            </td>
+
+                            <!-- 2025-03-27: 전화번호 열 - null 체크 추가 -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @(item?.PhoneNumber ?? "번호 없음")
+                            </td>
+
+                            <!-- 2025-03-27: 이메일 열 - null 체크 추가 -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @(item?.Email ?? "이메일 없음")
+                            </td>
+
+                            <!-- 2025-03-27: 등록일 열 - null 체크 추가 -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @(item?.RegisterDate.ToString("yyyy-MM-dd") ?? "날짜 없음")
+                            </td>
+
+                            <!-- 2025-03-27: 상태 열 - null 체크 추가 -->
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if (item?.IsActive == true)
+                                {
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                                        활성
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                                        비활성
+                                    </span>
+                                }
+                            </td>
+
+                            <!-- 2025-03-27: 작업 열 - 항목이 null이 아닌 경우에만 링크 표시 -->
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                @if (item != null)
+                                {
+                                    <a asp-action="Edit" asp-route-id="@item.Id" class="text-indigo-600 hover:text-indigo-900 mr-3">수정</a>
+                                    <a asp-action="Details" asp-route-id="@item.Id" class="text-blue-600 hover:text-blue-900 mr-3">상세</a>
+                                    <a asp-action="Delete" asp-route-id="@item.Id" class="text-red-600 hover:text-red-900 mr-3">삭제</a>
+                                }
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <!-- 2025-03-27: 모델이 null인 경우 표시할 메시지 -->
+                    <tr>
+                        <td colspan="6" class="px-6 py-4 text-center text-gray-500">
+                            표시할 회원 데이터가 없습니다.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

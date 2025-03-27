@@ -1,0 +1,65 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <!-- 메타 정보 -->
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SMS 알람 시스템</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/SMSAlarmSystem.styles.css" asp-append-version="true" />
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100">
+    <header>
+        <nav class="bg-white shadow-md">
+            <div class="container mx-auto px-4">
+                <div class="flex justify-between h-16">
+                    <div class="flex">
+                        <div class="flex-shrink-0 flex items-center">
+                            <a asp-area="" asp-controller="Home" asp-action="Index" class="text-xl font-bold text-blue-600">
+                                SMS 알람 시스템
+                            </a>
+                        </div>
+                        <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                            <a asp-area="" asp-controller="Home" asp-action="Index" class="border-transparent text-gray-500 hover:border-blue-500 hover:text-blue-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                홈
+                            </a>
+                            <a asp-area="" asp-controller="Members" asp-action="Index" class="border-transparent text-gray-500 hover:border-blue-500 hover:text-blue-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                회원 관리
+                            </a>
+                            <a asp-area="" asp-controller="MessageGroups" asp-action="Index" class="border-transparent text-gray-500 hover:border-blue-500 hover:text-blue-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                메시지 그룹
+                            </a>
+                            <a asp-area="" asp-controller="AlarmPoints" asp-action="Index" class="border-transparent text-gray-500 hover:border-blue-500 hover:text-blue-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                알람 포인트
+                            </a>
+                            <a asp-area="" asp-controller="Messages" asp-action="Index" class="border-transparent text-gray-500 hover:border-blue-500 hover:text-blue-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                                메시지 내역
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main role="main" class="pb-3">
+        @RenderBody()
+    </main>
+
+    <footer class="border-t bg-white py-4 mt-8">
+        <div class="container mx-auto px-4">
+            <div class="text-center text-gray-500">
+                <p>&copy; 2023 - SMS 알람 시스템</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
