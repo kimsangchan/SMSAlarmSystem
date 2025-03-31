@@ -132,9 +132,9 @@ namespace SMSAlarmSystem
             });
 
             // 비즈니스 서비스 계층 등록
-            services.AddScoped<MemberService>();                   // 회원 관리 서비스
+            services.AddScoped<IMemberService, MemberService>();                   // 회원 관리 서비스
             services.AddScoped<IMessageGroupService, MessageGroupService>();       // 메시지 그룹 관리 서비스
-            services.AddScoped<AlarmService>();                     // 알람 포인트 및 알람 트리거 서비스
+            services.AddScoped<IAlarmService, AlarmService>();                     // 알람 포인트 및 알람 트리거 서비스
             services.AddScoped<IMessageService, MessageService>();                 // 메시지 서비스
         }
 
