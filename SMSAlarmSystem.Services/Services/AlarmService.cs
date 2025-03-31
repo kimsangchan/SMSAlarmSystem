@@ -5,6 +5,7 @@
 using Microsoft.Extensions.Logging;
 using SMSAlarmSystem.Core.Interfaces;
 using SMSAlarmSystem.Core.Models;
+using SMSAlarmSystem.Services.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;

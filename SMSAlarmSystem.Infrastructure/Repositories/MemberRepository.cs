@@ -16,8 +16,8 @@ namespace SMSAlarmSystem.Infrastructure.Repositories
 {
     public class MemberRepository : Repository<Member>, IMemberRepository
     {
-        private readonly ApplicationDbContext _context;
-        private readonly ILogger<MemberRepository> _logger;
+        private new readonly ApplicationDbContext _context;
+        private new readonly ILogger<MemberRepository> _logger;
 
         public MemberRepository(ApplicationDbContext context, ILogger<MemberRepository> logger)
             : base(context, logger)

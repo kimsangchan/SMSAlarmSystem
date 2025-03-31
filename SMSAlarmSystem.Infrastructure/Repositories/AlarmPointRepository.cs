@@ -16,8 +16,8 @@ namespace SMSAlarmSystem.Infrastructure.Repositories
 {
     public class AlarmPointRepository : Repository<AlarmPoint>, IAlarmPointRepository
     {
-        private readonly ApplicationDbContext _context;
-        private readonly ILogger<AlarmPointRepository> _logger;
+        private new readonly ApplicationDbContext _context;
+        private new readonly ILogger<AlarmPointRepository> _logger;
 
         public AlarmPointRepository(ApplicationDbContext context, ILogger<AlarmPointRepository> logger)
             : base(context, logger)

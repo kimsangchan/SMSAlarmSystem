@@ -16,8 +16,8 @@ namespace SMSAlarmSystem.Infrastructure.Repositories
 {
     public class MessageGroupRepository : Repository<MessageGroup>, IMessageGroupRepository
     {
-        private readonly ApplicationDbContext _context;
-        private readonly ILogger<MessageGroupRepository> _logger;
+        private new readonly ApplicationDbContext _context;
+        private new readonly ILogger<MessageGroupRepository> _logger;
 
         public MessageGroupRepository(ApplicationDbContext context, ILogger<MessageGroupRepository> logger)
             : base(context, logger)
