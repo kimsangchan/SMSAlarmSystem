@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using SMSAlarmSystem.Core.Models;
+using SMSAlarmSystem.Services.Interfaces;
 using SMSAlarmSystem.Services.Services;
 using System.Threading.Tasks;
 
@@ -8,10 +9,10 @@ namespace SMSAlarmSystem.Controllers
 {
     public class MessageGroupsController : Controller
     {
-        private readonly MessageGroupService _messageGroupService;
+        private readonly IMessageGroupService _messageGroupService;
         private readonly MemberService _memberService;
 
-        public MessageGroupsController(MessageGroupService messageGroupService, MemberService memberService)
+        public MessageGroupsController(IMessageGroupService messageGroupService, MemberService memberService)
         {
             _messageGroupService = messageGroupService;
             _memberService = memberService;

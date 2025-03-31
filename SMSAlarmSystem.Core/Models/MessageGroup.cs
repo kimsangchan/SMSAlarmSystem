@@ -14,6 +14,13 @@ namespace SMSAlarmSystem.Core.Models
         public string? Description { get; set; } // 그룹 설명 (null 허용)
         public bool IsActive { get; set; } = true; // 활성 상태
 
+        // 추가된 속성
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime? UpdatedAt { get; set; }
+
+        // 탐색 속성
+        public virtual ICollection<Member> Members { get; set; } = new List<Member>();
+        public virtual ICollection<Message> Messages { get; set; } = new List<Message>();
         // 회원과의 관계 (다대다 관계)
         public ICollection<MessageGroupMember> GroupMembers { get; set; } = new List<MessageGroupMember>();
         // 알람 포인트와의 관계 (일대다 관계)
