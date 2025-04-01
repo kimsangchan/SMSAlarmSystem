@@ -1,0 +1,127 @@
+﻿@*
+작성자: Sangchan, Kim
+작성일: 2025-04-01
+기능: 페이지네이션 부분 뷰
+설명: 모든 목록 페이지에서 재사용 가능한 페이지네이션 컨트롤을 제공합니다.
+*@
+
+@model dynamic
+
+@{
+    // null 체크 및 필요한 속성 존재 여부 확인
+    bool isValidModel = Model != null &&
+                        Model.GetType().GetProperty("TotalPages") != null &&
+                        Model.GetType().GetProperty("CurrentPage") != null &&
+                        Model.GetType().GetProperty("PageSize") != null &&
+                        Model.GetType().GetProperty("TotalItems") != null &&
+                        Model.GetType().GetProperty("HasPreviousPage") != null &&
+                        Model.GetType().GetProperty("HasNextPage") != null;
+
+    if (isValidModel && Model.TotalPages > 1)
+    {
+        <div class="flex justify-center mt-6">
+            <nav class="inline-flex rounded-md shadow-sm -space-x-px" aria-label="페이지네이션">
+                <!-- 이전 페이지 버튼 -->
+                @if (Model.HasPreviousPage)
+                {
+                    <a href="@GetPageUrl(Model.CurrentPage - 1)"
+                       class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        <span class="sr-only">이전</span>
+                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                    </a>
+                }
+                else
+                {
+                    <span class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">
+                        <span class="sr-only">이전</span>
+                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                        </svg>
+                    </span>
+                }
+
+                <!-- 페이지 번호 버튼 -->
+                @{
+                    var startPage = Math.Max(1, Model.CurrentPage - 2);
+                    var endPage = Math.Min(Model.TotalPages, startPage + 4);
+
+                    if (endPage - startPage < 4 && Model.TotalPages > 4)
+                    {
+                        startPage = Math.Max(1, endPage - 4);
+                    }
+                }
+
+                @for (var i = startPage; i <= endPage; i++)
+                {
+                    if (i == Model.CurrentPage)
+                    {
+                        <span class="relative inline-flex items-center px-4 py-2 border border-blue-500 bg-blue-50 text-sm font-medium text-blue-600">
+                            @i
+                        </span>
+                    }
+                    else
+                    {
+                        <a href="@GetPageUrl(i)"
+                           class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50">
+                            @i
+                        </a>
+                    }
+                }
+
+                <!-- 다음 페이지 버튼 -->
+                @if (Model.HasNextPage)
+                {
+                    <a href="@GetPageUrl(Model.CurrentPage + 1)"
+                       class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                        <span class="sr-only">다음</span>
+                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                    </a>
+                }
+                else
+                {
+                    <span class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-gray-100 text-sm font-medium text-gray-400 cursor-not-allowed">
+                        <span class="sr-only">다음</span>
+                        <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                            <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" />
+                        </svg>
+                    </span>
+                }
+            </nav>
+        </div>
+
+        <!-- 페이지 정보 표시 -->
+        <div class="text-center text-sm text-gray-500 mt-2">
+            총 @(Model.TotalItems)개 항목 중 @((Model.CurrentPage - 1) * Model.PageSize + 1)~@(Math.Min(Model.CurrentPage * Model.PageSize, Model.TotalItems))개 표시 (총 @Model.TotalPages 페이지)
+        </div>
+    }
+    else if (isValidModel && Model.TotalItems > 0)
+    {
+        <!-- 페이지가 1개 이하인 경우 정보만 표시 -->
+        <div class="text-center text-sm text-gray-500 mt-6">
+            총 @(Model.TotalItems)개 항목 표시
+        </div>
+    }
+}
+
+@functions {
+    /// <summary>
+    /// 페이지 URL 생성 함수 - 현재 필터 조건을 유지하면서 페이지만 변경
+    /// </summary>
+    /// <param name="page">이동할 페이지 번호</param>
+    /// <returns>페이지 URL 문자열</returns>
+    private string GetPageUrl(int page)
+    {
+        // 현재 페이지의 모든 쿼리 파라미터를 유지하면서 페이지만 변경
+        var queryParams = Context.Request.Query
+                            .Where(p => p.Key != "page")
+                            .ToDictionary(p => p.Key, p => p.Value.ToString());
+
+        queryParams["page"] = page.ToString();
+
+        return Url.Action("Index", queryParams) ?? "";
+    }
+}
