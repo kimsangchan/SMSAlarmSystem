@@ -6,6 +6,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using SMSAlarmSystem.Core.Models;
+using SMSAlarmSystem.Helpers;
 using SMSAlarmSystem.Models;
 using SMSAlarmSystem.Services.Interfaces;
 using System;
@@ -22,6 +23,9 @@ namespace SMSAlarmSystem.Controllers
         // 회원 관련 비즈니스 로직을 처리하는 서비스
         private readonly IMemberService _memberService;
 
+        // 페이지네이션 처리를 위한 헬퍼
+        private readonly PaginationHelper<Member> _paginationHelper;
+
         // 로깅을 위한 로거 인스턴스
         private readonly ILogger<MembersController> _logger;
 
@@ -29,11 +33,16 @@ namespace SMSAlarmSystem.Controllers
         /// MembersController 생성자
         /// </summary>
         /// <param name="memberService">회원 서비스 인스턴스</param>
+        /// <param name="paginationHelper">페이지네이션 헬퍼 인스턴스</param>
         /// <param name="logger">로깅을 위한 ILogger 인스턴스</param>
         /// <exception cref="ArgumentNullException">필수 매개변수가 null인 경우 발생</exception>
-        public MembersController(IMemberService memberService, ILogger<MembersController> logger)
+        public MembersController(
+            IMemberService memberService,
+            PaginationHelper<Member> paginationHelper,
+            ILogger<MembersController> logger)
         {
             _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService), "회원 서비스는 null이 될 수 없습니다.");
+            _paginationHelper = paginationHelper ?? throw new ArgumentNullException(nameof(paginationHelper), "페이지네이션 헬퍼는 null이 될 수 없습니다.");
             _logger = logger ?? throw new ArgumentNullException(nameof(logger), "로거는 null이 될 수 없습니다.");
 
             _logger.LogInformation("MembersController 초기화 완료");
@@ -49,10 +58,7 @@ namespace SMSAlarmSystem.Controllers
         {
             try
             {
-                // 페이지 번호와 페이지 크기 유효성 검사
-                if (page < 1) page = 1;
-                if (pageSize < 1) pageSize = 10;
-
+                // 페이지네이션 파라미터 로깅
                 _logger.LogInformation("회원 목록 조회 시작: 페이지={Page}, 페이지크기={PageSize}", page, pageSize);
 
                 // 모든 회원 조회
@@ -65,33 +71,24 @@ namespace SMSAlarmSystem.Controllers
                     allMembers = new List<Member>();
                 }
 
-                // 페이지네이션 적용
-                var totalItems = allMembers.Count();
-                var pagedMembers = allMembers
-                    .Skip((page - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToList();
+                // 페이지네이션 헬퍼를 사용하여 페이지네이션 적용
+                var model = _paginationHelper.CreatePaginatedModel(allMembers, page, pageSize);
 
-                // 페이지네이션 뷰 모델 생성
-                var model = new PaginatedViewModel<Member>
-                {
-                    Items = pagedMembers,
-                    CurrentPage = page,
-                    PageSize = pageSize,
-                    TotalItems = totalItems
-                };
-
+                // 결과 로깅
                 _logger.LogInformation("회원 목록 조회 완료: 총 {TotalItems}명 중 {PagedCount}명 표시",
-                    totalItems, pagedMembers.Count);
+                    model.TotalItems, model.Items.Count());
 
                 return View(model);
             }
             catch (Exception ex)
             {
+                // 오류 로깅
                 _logger.LogError(ex, "회원 목록 조회 중 오류 발생: {ErrorMessage}", ex.Message);
 
-                // 오류 발생 시 빈 모델로 뷰 표시
+                // 오류 메시지를 TempData에 저장하여 뷰에서 표시
                 TempData["ErrorMessage"] = "회원 목록을 불러오는 중 오류가 발생했습니다.";
+
+                // 오류 발생 시 빈 모델로 뷰 표시
                 return View(new PaginatedViewModel<Member>());
             }
         }

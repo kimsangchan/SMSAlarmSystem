@@ -3,6 +3,9 @@
 // 기능: 페이지네이션을 위한 뷰 모델
 // 설명: 페이지네이션 정보와 데이터를 함께 담는 제네릭 클래스입니다.
 
+using System;
+using System.Collections.Generic;
+
 namespace SMSAlarmSystem.Models
 {
     /// <summary>
@@ -32,17 +35,17 @@ namespace SMSAlarmSystem.Models
         public int TotalItems { get; set; } = 0;
 
         /// <summary>
-        /// 전체 페이지 수
+        /// 전체 페이지 수 (계산 속성)
         /// </summary>
         public int TotalPages => (int)Math.Ceiling(TotalItems / (double)PageSize);
 
         /// <summary>
-        /// 이전 페이지가 있는지 여부
+        /// 이전 페이지가 있는지 여부 (계산 속성)
         /// </summary>
         public bool HasPreviousPage => CurrentPage > 1;
 
         /// <summary>
-        /// 다음 페이지가 있는지 여부
+        /// 다음 페이지가 있는지 여부 (계산 속성)
         /// </summary>
         public bool HasNextPage => CurrentPage < TotalPages;
     }

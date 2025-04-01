@@ -5,6 +5,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using SMSAlarmSystem.Core.Models;
+using SMSAlarmSystem.Helpers;
 using SMSAlarmSystem.Models;
 using SMSAlarmSystem.Services.Interfaces;
 using System;
@@ -18,18 +19,28 @@ namespace SMSAlarmSystem.Controllers
     /// </summary>
     public class MessagesController : Controller
     {
+        // 메시지 관련 비즈니스 로직을 처리하는 서비스
         private readonly IMessageService _messageService;
-        private readonly ILogger<MessagesController> _logger;
 
+        // 페이지네이션 처리를 위한 헬퍼
+        private readonly PaginationHelper<Message> _paginationHelper;
+
+        // 로깅을 위한 로거 인스턴스
+        private readonly ILogger<MessagesController> _logger;
         /// <summary>
         /// MessagesController 생성자
         /// </summary>
         /// <param name="messageService">메시지 서비스 인스턴스</param>
+        /// <param name="paginationHelper">페이지네이션 헬퍼 인스턴스</param>
         /// <param name="logger">로깅을 위한 ILogger 인스턴스</param>
         /// <exception cref="ArgumentNullException">필수 매개변수가 null인 경우 발생</exception>
-        public MessagesController(IMessageService messageService, ILogger<MessagesController> logger)
+        public MessagesController(
+            IMessageService messageService,
+            PaginationHelper<Message> paginationHelper,
+            ILogger<MessagesController> logger)
         {
             _messageService = messageService ?? throw new ArgumentNullException(nameof(messageService), "메시지 서비스는 null이 될 수 없습니다.");
+            _paginationHelper = paginationHelper ?? throw new ArgumentNullException(nameof(paginationHelper), "페이지네이션 헬퍼는 null이 될 수 없습니다.");
             _logger = logger ?? throw new ArgumentNullException(nameof(logger), "로거는 null이 될 수 없습니다.");
 
             _logger.LogInformation("MessagesController 초기화 완료");
@@ -47,11 +58,6 @@ namespace SMSAlarmSystem.Controllers
         {
             try
             {
-                // 페이지 번호와 페이지 크기 유효성 검사
-                if (page < 1) page = 1;
-                if (pageSize < 1) pageSize = 10;
-                if (pageSize > 100) pageSize = 100; // 최대 100개로 제한
-
                 // 날짜 범위 설정 (기본값: 최근 7일)
                 var today = DateTime.Today;
                 var defaultStartDate = today.AddDays(-7);
@@ -82,28 +88,15 @@ namespace SMSAlarmSystem.Controllers
                 // 최신 메시지부터 표시하도록 정렬
                 var orderedMessages = messages.OrderByDescending(m => m.SendTime);
 
-                // 페이지네이션 적용
-                var totalItems = orderedMessages.Count();
-                var pagedMessages = orderedMessages
-                    .Skip((page - 1) * pageSize)
-                    .Take(pageSize)
-                    .ToList();
-
-                // 페이지네이션 뷰 모델 생성
-                var model = new PaginatedViewModel<Message>
-                {
-                    Items = pagedMessages,
-                    CurrentPage = page,
-                    PageSize = pageSize,
-                    TotalItems = totalItems
-                };
+                // 페이지네이션 헬퍼를 사용하여 페이지네이션 적용
+                var model = _paginationHelper.CreatePaginatedModel(orderedMessages, page, pageSize);
 
                 // 날짜 범위를 ViewBag에 저장 (폼에 표시하기 위함)
                 ViewBag.StartDate = actualStartDate.ToString("yyyy-MM-dd");
                 ViewBag.EndDate = actualEndDate.ToString("yyyy-MM-dd");
 
                 _logger.LogInformation("메시지 목록 조회 완료: 총 {TotalItems}개 중 {PagedCount}개 표시",
-                    totalItems, pagedMessages.Count);
+                    model.TotalItems, model.Items.Count());
 
                 return View(model);
             }
@@ -111,8 +104,10 @@ namespace SMSAlarmSystem.Controllers
             {
                 _logger.LogError(ex, "메시지 목록 조회 중 오류 발생: {ErrorMessage}", ex.Message);
 
-                // 오류 발생 시 빈 모델로 뷰 표시
+                // 오류 메시지를 TempData에 저장하여 뷰에서 표시
                 TempData["ErrorMessage"] = "메시지 목록을 불러오는 중 오류가 발생했습니다.";
+
+                // 오류 발생 시 빈 모델로 뷰 표시
                 return View(new PaginatedViewModel<Message>());
             }
         }

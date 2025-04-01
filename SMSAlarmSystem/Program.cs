@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using SMSAlarmSystem.Core.Interfaces;
+using SMSAlarmSystem.Helpers;
 using SMSAlarmSystem.Infrastructure.Data;
 using SMSAlarmSystem.Infrastructure.Repositories;
 using SMSAlarmSystem.Services.Interfaces;
@@ -136,6 +137,7 @@ namespace SMSAlarmSystem
             services.AddScoped<IMessageGroupService, MessageGroupService>();       // 메시지 그룹 관리 서비스
             services.AddScoped<IAlarmService, AlarmService>();                     // 알람 포인트 및 알람 트리거 서비스
             services.AddScoped<IMessageService, MessageService>();                 // 메시지 서비스
+            services.AddScoped(typeof(PaginationHelper<>));                         // 페이지네이션 헬퍼 등록
         }
 
         /// <summary>
