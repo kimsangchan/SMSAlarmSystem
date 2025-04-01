@@ -5,6 +5,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using SMSAlarmSystem.Core.Models;
+using SMSAlarmSystem.Models;
 using SMSAlarmSystem.Services.Interfaces;
 using System;
 using System.Threading.Tasks;
@@ -36,57 +37,86 @@ namespace SMSAlarmSystem.Controllers
 
         /// <summary>
         /// 메시지 목록 페이지를 표시합니다.
-        /// 날짜 범위로 메시지를 필터링할 수 있습니다.
         /// </summary>
-        /// <param name="startDate">조회 시작 날짜 (기본값: 7일 전)</param>
-        /// <param name="endDate">조회 종료 날짜 (기본값: 현재)</param>
-        /// <returns>메시지 목록 뷰</returns>
-        public async Task<IActionResult> Index(DateTime? startDate, DateTime? endDate)
+        /// <param name="page">페이지 번호 (1부터 시작)</param>
+        /// <param name="pageSize">페이지당 표시할 메시지 수</param>
+        /// <param name="startDate">조회 시작 날짜</param>
+        /// <param name="endDate">조회 종료 날짜</param>
+        /// <returns>페이지네이션이 적용된 메시지 목록 뷰</returns>
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 10, DateTime? startDate = null, DateTime? endDate = null)
         {
             try
             {
-                // 기본 날짜 범위 설정 (오늘부터 7일 전까지)
-                var start = startDate ?? DateTime.Now.AddDays(-7);
-                var end = endDate ?? DateTime.Now;
+                // 페이지 번호와 페이지 크기 유효성 검사
+                if (page < 1) page = 1;
+                if (pageSize < 1) pageSize = 10;
+                if (pageSize > 100) pageSize = 100; // 최대 100개로 제한
 
-                // 시작 날짜가 종료 날짜보다 늦은 경우 조정
-                if (start > end)
+                // 날짜 범위 설정 (기본값: 최근 7일)
+                var today = DateTime.Today;
+                var defaultStartDate = today.AddDays(-7);
+                var defaultEndDate = today;
+
+                var actualStartDate = startDate ?? defaultStartDate;
+                var actualEndDate = endDate ?? defaultEndDate;
+
+                // 종료일이 시작일보다 이전인 경우 조정
+                if (actualEndDate < actualStartDate)
                 {
-                    _logger.LogWarning("날짜 범위 조정: 시작 날짜가 종료 날짜보다 늦습니다. 시작={Start}, 종료={End}", start, end);
-                    var temp = start;
-                    start = end;
-                    end = temp;
+                    actualEndDate = actualStartDate;
                 }
 
-                // 뷰에 날짜 정보 전달
-                ViewBag.StartDate = start.ToString("yyyy-MM-dd");
-                ViewBag.EndDate = end.ToString("yyyy-MM-dd");
+                _logger.LogInformation("메시지 목록 조회 시작: 페이지={Page}, 페이지크기={PageSize}, 시작일={StartDate}, 종료일={EndDate}",
+                    page, pageSize, actualStartDate, actualEndDate);
 
-                _logger.LogInformation("메시지 목록 조회: 시작={Start}, 종료={End}", start, end);
+                // 날짜 범위로 메시지 조회
+                var messages = await _messageService.GetMessagesByDateRangeAsync(actualStartDate, actualEndDate);
 
-                // 메시지 조회
-                var messages = await _messageService.GetMessagesByDateRangeAsync(start, end);
-
-                // 결과가 null인 경우 빈 목록으로 대체 (방어적 프로그래밍)
+                // null 체크 (방어적 프로그래밍)
                 if (messages == null)
                 {
                     _logger.LogWarning("메시지 서비스에서 null 반환됨. 빈 목록으로 대체합니다.");
                     messages = new List<Message>();
                 }
 
-                return View(messages);
+                // 최신 메시지부터 표시하도록 정렬
+                var orderedMessages = messages.OrderByDescending(m => m.SendTime);
+
+                // 페이지네이션 적용
+                var totalItems = orderedMessages.Count();
+                var pagedMessages = orderedMessages
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+
+                // 페이지네이션 뷰 모델 생성
+                var model = new PaginatedViewModel<Message>
+                {
+                    Items = pagedMessages,
+                    CurrentPage = page,
+                    PageSize = pageSize,
+                    TotalItems = totalItems
+                };
+
+                // 날짜 범위를 ViewBag에 저장 (폼에 표시하기 위함)
+                ViewBag.StartDate = actualStartDate.ToString("yyyy-MM-dd");
+                ViewBag.EndDate = actualEndDate.ToString("yyyy-MM-dd");
+
+                _logger.LogInformation("메시지 목록 조회 완료: 총 {TotalItems}개 중 {PagedCount}개 표시",
+                    totalItems, pagedMessages.Count);
+
+                return View(model);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "메시지 목록 조회 중 오류 발생: {ErrorMessage}", ex.Message);
 
-                // 오류 메시지를 TempData에 저장하여 뷰에서 표시
+                // 오류 발생 시 빈 모델로 뷰 표시
                 TempData["ErrorMessage"] = "메시지 목록을 불러오는 중 오류가 발생했습니다.";
-
-                // 빈 목록 반환
-                return View(new List<Message>());
+                return View(new PaginatedViewModel<Message>());
             }
         }
+
 
         /// <summary>
         /// 메시지 상세 정보 페이지를 표시합니다.

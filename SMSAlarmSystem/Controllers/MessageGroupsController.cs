@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using SMSAlarmSystem.Core.Models;
+using SMSAlarmSystem.Models;
 using SMSAlarmSystem.Services.Interfaces;
 using System;
 using System.Threading.Tasks;
@@ -50,25 +51,62 @@ namespace SMSAlarmSystem.Controllers
         /// <summary>
         /// 메시지 그룹 목록 페이지를 표시합니다.
         /// </summary>
-        /// <returns>메시지 그룹 목록 뷰</returns>
-        public async Task<IActionResult> Index()
+        /// <param name="page">페이지 번호 (1부터 시작)</param>
+        /// <param name="pageSize">페이지당 표시할 메시지 그룹 수</param>
+        /// <returns>페이지네이션이 적용된 메시지 그룹 목록 뷰</returns>
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 10)
         {
             try
             {
-                _logger.LogInformation("메시지 그룹 목록 조회 시작");
-                var groups = await _messageGroupService.GetAllGroupsAsync();
-                _logger.LogInformation("메시지 그룹 목록 조회 완료");
-                return View(groups);
+                // 페이지 번호와 페이지 크기 유효성 검사
+                if (page < 1) page = 1;
+                if (pageSize < 1) pageSize = 10;
+                if (pageSize > 100) pageSize = 100; // 최대 100개로 제한
+
+                _logger.LogInformation("메시지 그룹 목록 조회 시작: 페이지={Page}, 페이지크기={PageSize}", page, pageSize);
+
+                // 모든 메시지 그룹 조회
+                var allGroups = await _messageGroupService.GetAllGroupsAsync();
+
+                // null 체크 (방어적 프로그래밍)
+                if (allGroups == null)
+                {
+                    _logger.LogWarning("메시지 그룹 서비스에서 null 반환됨. 빈 목록으로 대체합니다.");
+                    allGroups = new List<MessageGroup>();
+                }
+
+                // 페이지네이션 적용
+                var totalItems = allGroups.Count();
+                var pagedGroups = allGroups
+                    .Skip((page - 1) * pageSize)
+                    .Take(pageSize)
+                    .ToList();
+
+                // 페이지네이션 뷰 모델 생성
+                var model = new PaginatedViewModel<MessageGroup>
+                {
+                    Items = pagedGroups,
+                    CurrentPage = page,
+                    PageSize = pageSize,
+                    TotalItems = totalItems
+                };
+
+                _logger.LogInformation("메시지 그룹 목록 조회 완료: 총 {TotalItems}개 중 {PagedCount}개 표시",
+                    totalItems, pagedGroups.Count);
+
+                return View(model);
             }
             catch (Exception ex)
             {
+                // 오류 로깅 추가 (CS0168 경고 해결)
                 _logger.LogError(ex, "메시지 그룹 목록 조회 중 오류 발생: {ErrorMessage}", ex.Message);
 
-                // 오류 메시지를 TempData에 저장하여 뷰에서 표시
+                // 오류 발생 시 빈 모델로 뷰 표시
                 TempData["ErrorMessage"] = "메시지 그룹 목록을 불러오는 중 오류가 발생했습니다.";
-                return View(Array.Empty<MessageGroup>());
+                return View(new PaginatedViewModel<MessageGroup>());
             }
         }
+
 
         /// <summary>
         /// 메시지 그룹 상세 정보 페이지를 표시합니다.
