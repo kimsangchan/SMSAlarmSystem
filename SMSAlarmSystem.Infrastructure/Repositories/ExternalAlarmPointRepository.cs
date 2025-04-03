@@ -198,5 +198,101 @@ namespace SMSAlarmSystem.Infrastructure.Repositories
                 throw;
             }
         }
+        /// <summary>
+        /// 지정된 ID로 알람 포인트를 조회합니다.
+        /// </summary>
+        /// <param name="objectSeq">객체 시퀀스</param>
+        /// <param name="systemId">시스템 ID</param>
+        /// <param name="deviceId">장치 ID</param>
+        /// <returns>알람 포인트 또는 null</returns>
+        public async Task<ExternalAlarmPointDto> GetAlarmPointByIdsAsync(long? objectSeq, int? systemId, int? deviceId)
+        {
+            try
+            {
+                using (var connection = new SqlConnection(_connectionString))
+                {
+                    await connection.OpenAsync();
+
+                    string whereClause = "";
+                    if (objectSeq.HasValue)
+                    {
+                        whereClause += " AND p.OBJECT_SEQ = @ObjectSeq";
+                    }
+                    if (systemId.HasValue)
+                    {
+                        whereClause += " AND p.SYSTEM_ID = @SystemId";
+                    }
+                    if (deviceId.HasValue)
+                    {
+                        whereClause += " AND p.DEVICE_ID = @DeviceId";
+                    }
+
+                    if (string.IsNullOrEmpty(whereClause))
+                    {
+                        _logger.LogWarning("알람 포인트 조회를 위한 조건이 지정되지 않았습니다.");
+                        return null;
+                    }
+
+                    // 첫 번째 ' AND '를 'WHERE'로 변경
+                    whereClause = " WHERE" + whereClause.Substring(4);
+
+                    string query = $@"
+                SELECT TOP 1
+                    p.OBJECT_SEQ, p.OBJECT_ID, p.SERVER_ID, p.SYSTEM_ID, p.DEVICE_ID,
+                    p.OBJ_NAME, p.OBJ_DESC, p.ALARM_LV, p.OBJ_ABOVE, p.OBJ_BELOW,
+                    c.CODE_NAME AS SystemName
+                FROM P_OBJECT p
+                LEFT JOIN P_OBJ_CODE c ON p.SYSTEM_ID = c.SYSTEM_CODE
+                {whereClause}";
+
+                    using (var command = new SqlCommand(query, connection))
+                    {
+                        if (objectSeq.HasValue)
+                        {
+                            command.Parameters.AddWithValue("@ObjectSeq", objectSeq.Value);
+                        }
+                        if (systemId.HasValue)
+                        {
+                            command.Parameters.AddWithValue("@SystemId", systemId.Value);
+                        }
+                        if (deviceId.HasValue)
+                        {
+                            command.Parameters.AddWithValue("@DeviceId", deviceId.Value);
+                        }
+
+                        using (var reader = await command.ExecuteReaderAsync())
+                        {
+                            if (await reader.ReadAsync())
+                            {
+                                return new ExternalAlarmPointDto
+                                {
+                                    ObjectSeq = reader["OBJECT_SEQ"] != DBNull.Value ? Convert.ToInt64(reader["OBJECT_SEQ"]) : 0,
+                                    ObjectId = reader["OBJECT_ID"] != DBNull.Value ? Convert.ToInt64(reader["OBJECT_ID"]) : 0,
+                                    ServerId = reader["SERVER_ID"] != DBNull.Value ? Convert.ToInt32(reader["SERVER_ID"]) : 0,
+                                    SystemId = reader["SYSTEM_ID"] != DBNull.Value ? Convert.ToInt32(reader["SYSTEM_ID"]) : 0,
+                                    DeviceId = reader["DEVICE_ID"] != DBNull.Value ? Convert.ToInt32(reader["DEVICE_ID"]) : 0,
+                                    // 문자열 필드는 DBNull 체크 후 ToString() 결과가 null일 경우 빈 문자열 할당
+                                    ObjName = reader["OBJ_NAME"] != DBNull.Value ? reader["OBJ_NAME"].ToString() ?? string.Empty : string.Empty,
+                                    ObjDesc = reader["OBJ_DESC"] != DBNull.Value ? reader["OBJ_DESC"].ToString() ?? string.Empty : string.Empty,
+                                    AlarmLv = reader["ALARM_LV"] != DBNull.Value ? Convert.ToInt32(reader["ALARM_LV"]) : 0,
+                                    ObjAbove = reader["OBJ_ABOVE"] != DBNull.Value ? Convert.ToInt32(reader["OBJ_ABOVE"]) : 0,
+                                    ObjBelow = reader["OBJ_BELOW"] != DBNull.Value ? Convert.ToInt32(reader["OBJ_BELOW"]) : 0,
+                                    // 문자열 필드는 DBNull 체크 후 ToString() 결과가 null일 경우 빈 문자열 할당
+                                    SystemName = reader["SystemName"] != DBNull.Value ? reader["SystemName"].ToString() ?? string.Empty : string.Empty,
+                                };
+                            }
+                        }
+                    }
+
+                    return null;
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "지정된 ID로 알람 포인트 조회 중 오류 발생: {Message}", ex.Message);
+                return null;
+            }
+        }
+
     }
 }

@@ -27,13 +27,22 @@ namespace SMSAlarmSystem.Infrastructure.Repositories
         /// <returns>알람 포인트 목록</returns>
         Task<IEnumerable<ExternalAlarmPointDto>> GetDistinctAlarmPointsAsync();
 
-            /// <summary>
-            /// 특정 시스템 코드와 부모 ID에 해당하는 알람 포인트 목록을 조회합니다. ALARM_LV = 1 조건이 적용됩니다.
-            /// </summary>
-            /// <param name="systemCode">시스템 코드</param>
-            /// <param name="parentId">부모 ID</param>
-            /// <returns>알람 포인트 목록</returns>
-            Task<IEnumerable<ExternalAlarmPointDto>> GetAlarmPointsBySystemCodeAndParentIdAsync(int systemCode, int parentId);
+        /// <summary>
+        /// 특정 시스템 코드와 부모 ID에 해당하는 알람 포인트 목록을 조회합니다. ALARM_LV = 1 조건이 적용됩니다.
+        /// </summary>
+        /// <param name="systemCode">시스템 코드</param>
+        /// <param name="parentId">부모 ID</param>
+        /// <returns>알람 포인트 목록</returns>
+        Task<IEnumerable<ExternalAlarmPointDto>> GetAlarmPointsBySystemCodeAndParentIdAsync(int systemCode, int parentId);
+
+        /// <summary>
+        /// 지정된 ID로 알람 포인트를 조회합니다.
+        /// </summary>
+        /// <param name="objectSeq">객체 시퀀스</param>
+        /// <param name="systemId">시스템 ID</param>
+        /// <param name="deviceId">장치 ID</param>
+        /// <returns>알람 포인트 또는 null</returns>
+        Task<ExternalAlarmPointDto> GetAlarmPointByIdsAsync(long? objectSeq, int? systemId, int? deviceId);
 
     }
 
