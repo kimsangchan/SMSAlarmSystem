@@ -295,6 +295,11 @@ namespace SMSAlarmSystem.Services.Services
             }
         }
 
+        // 작성자: Sangchan, Kim
+        // 작성일: 2025-04-03
+        // 기능: 알람 포인트 삭제 서비스
+        // 설명: 지정된 ID의 알람 포인트를 삭제하는 서비스 메서드입니다.
+
         /// <summary>
         /// 알람 포인트를 삭제합니다.
         /// </summary>
@@ -321,7 +326,8 @@ namespace SMSAlarmSystem.Services.Services
                     return false;
                 }
 
-                await _alarmPointRepository.DeleteAsync(alarmPoint);
+                // ID를 사용하여 알람 포인트 삭제 (AlarmPoint 객체 대신 ID 전달)
+                await _alarmPointRepository.DeleteAsync(id);
                 _logger.LogInformation("알람 포인트 삭제 완료: ID={Id}, 이름={Name}", id, alarmPoint.Name);
                 return true;
             }
@@ -331,6 +337,7 @@ namespace SMSAlarmSystem.Services.Services
                 return false;
             }
         }
+
 
         /// <summary>
         /// 알람을 발생시키고 관련 그룹에 메시지를 발송합니다.

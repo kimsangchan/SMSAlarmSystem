@@ -13,6 +13,7 @@ using SMSAlarmSystem.Core.Interfaces;
 using SMSAlarmSystem.Helpers;
 using SMSAlarmSystem.Infrastructure.Data;
 using SMSAlarmSystem.Infrastructure.Repositories;
+using SMSAlarmSystem.Services;
 using SMSAlarmSystem.Services.Interfaces;
 using SMSAlarmSystem.Services.Services;
 using System;
@@ -69,6 +70,15 @@ namespace SMSAlarmSystem
                 }
                 options.UseSqlServer(connectionString);
             });
+            // 외부 데이터베이스 설정 등록 - IBSInfo 데이터베이스 연결 정보
+            builder.Services.Configure<ExternalDbSettings>(builder.Configuration.GetSection("ExternalDatabase"));
+
+            // 외부 데이터베이스 연결 유효성 검사
+            var externalDbConfig = builder.Configuration.GetSection("ExternalDatabase").Get<ExternalDbSettings>();
+            if (externalDbConfig == null || string.IsNullOrEmpty(externalDbConfig.ConnectionString))
+            {
+                throw new InvalidOperationException("외부 데이터베이스 연결 문자열이 구성되지 않았습니다. appsettings.json 파일의 ExternalDatabase 섹션을 확인하세요.");
+            }
 
             // 리포지토리 계층 등록 - 의존성 주입을 위한 인터페이스와 구현체 매핑
             RegisterRepositories(builder.Services);
@@ -138,6 +148,17 @@ namespace SMSAlarmSystem
             services.AddScoped<IAlarmService, AlarmService>();                     // 알람 포인트 및 알람 트리거 서비스
             services.AddScoped<IMessageService, MessageService>();                 // 메시지 서비스
             services.AddScoped(typeof(PaginationHelper<>));                         // 페이지네이션 헬퍼 등록
+
+            
+            // 외부 데이터베이스 리포지토리 등록
+            services.AddScoped<IExternalAlarmPointRepository, ExternalAlarmPointRepository>();
+
+            // 알람 포인트 서비스 등록
+            services.AddScoped<IAlarmPointService, AlarmPointService>();
+            // 알람 포인트 동기화 서비스 등록
+            services.AddHostedService<AlarmPointSyncService>();
+            // 알람 포인트 변경 감지 서비스 등록 (호스티드 서비스)
+            services.AddHostedService<AlarmPointChangeDetectionService>();
         }
 
         /// <summary>

@@ -14,6 +14,9 @@ namespace SMSAlarmSystem.Core.Models
         public string? Condition { get; set; } // 알람 조건 (null 허용)
         public int MessageGroupId { get; set; } // 연결된 메시지 그룹 ID
         public bool IsActive { get; set; } = true; // 활성 상태
+        public string? ExternalId { get; set; } // 외부 시스템 ID (null 허용)
+        public DateTime CreatedAt { get; set; } // 생성 시간
+        public DateTime UpdatedAt { get; set; } // 수정 시간
 
         // 탐색 속성
         public MessageGroup? MessageGroup { get; set; } // 메시지 그룹 참조
